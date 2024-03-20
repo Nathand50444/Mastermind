@@ -3,6 +3,7 @@ class Mastermind
     def initialize
         @board = Array.new(96) { " " }
         show_board
+        turn
     end
 
     def show_board
@@ -33,19 +34,13 @@ class Mastermind
     end
 
     def turn_count
-        turn_count = 0
-        
+        game_turn = 0
     end
 
     def codemaker_code
         puts "You are the codemaker! Please choose your super secret, 4-digit code. (e.g 1234)"
         code_to_break = gets.chomp.chars.map(&:to_i)
     end
-
-    def codebreaker_guess
-        puts "You are the codebreaker! Guess the 4 digit code."
-        code_guess = gets.chomp.chars.map(&:to_i)
-    end 
 
     def add_to_gameboard(game_turn, code_guess)
         box_index_1 = 0 + (game_turn * 8)
@@ -57,16 +52,20 @@ class Mastermind
         @board[box_index_3] = code_guess[3]
         @board[box_index_4] = code_guess[4]                     # Four lots of these (+1, +2, +3, +4) for each of code_guess[0 to 4]
     end
-
-    def add_to_feedback
-        fb_index_1 = 4 + (game_turn * 8)
-        fb_index_2 = 5 + (game_turn * 8)
-        fb_index_3 = 6 + (game_turn * 8)
-        fb_index_4 = 7 + (game_turn * 8)
-        # This will add in the feedback sections.
-    end
     
-    def feedback(code_guess)
+    def feedback
+        code.each_with_index do |number, index|
+            if number == guess[index]
+                @board[index + 4 + (game_turn * 8)] = "Red"
+            elsif guess.include?(number)
+                @board[index + 4 + (game_turn * 8)] = "White"
+            end
+        end
+    end
+
+    def turn
+        puts "You are the codebreaker! Guess the 4 digit code."
+        code_guess = gets.chomp.chars.map(&:to_i)
         
     end
 end
