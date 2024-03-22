@@ -84,6 +84,11 @@ class Mastermind
                     return
                 end
                 turn_count
+                if @turn == 12
+                    puts "Game over! You've reached the maximum number of turns."
+                    return
+                    break
+                  end
             else
                 puts "Invalid input."
           end
