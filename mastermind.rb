@@ -1,8 +1,12 @@
+require 'pry'
+
 class Mastermind
 
     def initialize
+        @turn = 0
         @board = Array.new(96) { " " }
         show_board
+        @code_to_break = codemaker_code
         turn
     end
 
@@ -34,38 +38,58 @@ class Mastermind
     end
 
     def turn_count
-        game_turn = 0
+        @turn += 1
     end
 
     def codemaker_code
         puts "You are the codemaker! Please choose your super secret, 4-digit code. (e.g 1234)"
-        code_to_break = gets.chomp.chars.map(&:to_i)
+        gets.chomp.chars.map(&:to_i)
     end
 
-    def add_to_gameboard(game_turn, code_guess)
-        box_index_1 = 0 + (game_turn * 8)
-        box_index_2 = 1 + (game_turn * 8)
-        box_index_3 = 2 + (game_turn * 8)
-        box_index_4 = 3 + (game_turn * 8)
-        @board[box_index_1] = code_guess[1]
-        @board[box_index_2] = code_guess[2]
-        @board[box_index_3] = code_guess[3]
-        @board[box_index_4] = code_guess[4]                     # Four lots of these (+1, +2, +3, +4) for each of code_guess[0 to 4]
+    def add_to_gameboard(code_guess)
+        offset = @turn * 8
+        code_guess.each_with_index do |digit, i|
+            @board[i + offset] = digit
+        end
     end
     
-    def feedback
-        code.each_with_index do |number, index|
-            if number == guess[index]
-                @board[index + 4 + (game_turn * 8)] = "Red"
-            elsif guess.include?(number)
-                @board[index + 4 + (game_turn * 8)] = "White"
+    def feedback(code_guess, code_to_break)
+        code_guess.each_with_index do |digit, i|
+            if digit == code_to_break[i]
+                @board[4 + @turn * 8 + i] = "Red"
+            elsif code_to_break.include?(digit)
+                @board[4 + @turn * 8 + i] = "White"
             end
         end
     end
-
+      
     def turn
-        puts "You are the codebreaker! Guess the 4 digit code."
-        code_guess = gets.chomp.chars.map(&:to_i)
-        
+        loop do
+            puts "You are the codebreaker! Guess the 4 digit code."
+            code_guess = gets.chomp.chars.map(&:to_i)
+            add_to_gameboard(code_guess)
+            feedback(code_guess, @code_to_break)
+            show_board
+            if win_condition?
+                puts "Congratulations! You've cracked the code!"
+                return
+            end
+            turn_count
+        end
+    end
+
+    def win_condition?
+        @board.each_slice(8) do |row|
+            consecutive_red_count = 0
+            row.each do |peg|
+                if peg == "Red"
+                    consecutive_red_count += 1
+                    return true if consecutive_red_count == 4
+                else
+                    consecutive_red_count = 0
+                end
+            end
+        end
+        false
     end
 end
