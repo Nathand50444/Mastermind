@@ -42,8 +42,15 @@ class Mastermind
     end
 
     def codemaker_code
-        puts "You are the codemaker! Please choose your super secret, 4-digit code. (e.g 1234)"
-        gets.chomp.chars.map(&:to_i)
+        loop do
+            puts "You are the codemaker! Please choose your super secret, 4-digit, numeric code. (e.g 1234)"
+            code_to_break = gets.chomp
+            if code_to_break.match?(/\A\d{4}\z/)
+                return code_to_break.chars.map(&:to_i)
+            else
+                puts "Invalid input."
+            end
+        end
     end
 
     def add_to_gameboard(code_guess)
@@ -65,18 +72,23 @@ class Mastermind
       
     def turn
         loop do
-            puts "You are the codebreaker! Guess the 4 digit code."
-            code_guess = gets.chomp.chars.map(&:to_i)
-            add_to_gameboard(code_guess)
-            feedback(code_guess, @code_to_break)
-            show_board
-            if win_condition?
-                puts "Congratulations! You've cracked the code!"
-                return
-            end
-            turn_count
+            puts "You are the codebreaker! Guess the 4 digit, numeric code."
+            code_guess = gets.chomp
+            if code_guess.match?(/\A\d{4}\z/)
+                code_guess = code_guess.chomp.chars.map(&:to_i)
+                add_to_gameboard(code_guess)
+                feedback(code_guess, @code_to_break)
+                show_board
+                if win_condition?
+                    puts "Congratulations! You've cracked the code!"
+                    return
+                end
+                turn_count
+            else
+                puts "Invalid input."
+          end
         end
-    end
+      end
 
     def win_condition?
         @board.each_slice(8) do |row|
