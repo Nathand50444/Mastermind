@@ -1,13 +1,11 @@
-require 'pry'
-
 class Mastermind
 
-    def initialize
-        @turn = 0
-        @board = Array.new(96) { " " }
-        show_board
-        @code_to_break = codemaker_code
-        turn
+    def initialize                              # When a new instance of Mastermind is created, this calls the multiple methods and creation of instance variables.
+        @turn = 0                               # The turn is set to 0.
+        @board = Array.new(96) { " " }          # A new game board is set, consisting of 96 spaces. 12 turns of 8 spaces, and the board is shown.
+        show_board                              
+        @code_to_break = codemaker_code         # To start the game, the codemaker creates the code that the codebreaker needs to figure out.
+        turn                                    # 'turn' is called to start the game.
     end
 
     def show_board
@@ -35,14 +33,14 @@ class Mastermind
         puts " #{@board[80]} | #{@board[81]} | #{@board[82]} | #{@board[83]} | | | #{@board[84]} | #{@board[85]} | #{@board[86]} | #{@board[87]} |" 
         puts "---------------------------------"
         puts " #{@board[88]} | #{@board[89]} | #{@board[90]} | #{@board[91]} | | | #{@board[92]} | #{@board[93]} | #{@board[94]} | #{@board[95]} |"  
-    end
+    end         # The game board is set out, 12 turns of 8 spaces.
 
     def turn_count
-        @turn += 1
+        @turn += 1      # The turn_count method keeps track of the game turn.
     end
 
     def codemaker_code
-        loop do
+        loop do         # Here the codemaker is called to create their 4-digit, numeric code.
             puts "You are the codemaker! Please choose your super secret, 4-digit, numeric code. (e.g 1234)"
             code_to_break = gets.chomp
             if code_to_break.match?(/\A\d{4}\z/)
@@ -53,8 +51,8 @@ class Mastermind
         end
     end
 
-    def add_to_gameboard(code_guess)
-        offset = @turn * 8
+    def add_to_gameboard(code_guess)        # To accomodate the large game board, the values are added to the game board based on factors of 8 and the current index of the code_guess.
+        offset = @turn * 8                  # i.e. if we are on the fourth turn and the codebreaker makes a guess, the current digit in the iteration will be added to the 4th line based on 4 * 8.
         code_guess.each_with_index do |digit, i|
             @board[i + offset] = digit
         end
@@ -67,24 +65,24 @@ class Mastermind
             elsif code_to_break.include?(digit)
                 @board[4 + @turn * 8 + i] = "White"
             end
-        end
-    end
+        end             # Based on a Mastermind game board: RED pegs indicate a number that is in the code and in the correct position, and WHITE pegs indictae correct number but wrong position.
+    end                 # Comparisons are made between the code_guess and the code_to_break which determines whether a RED, WHITE or NO peg is added to the 4 positions opposite the guess on the game board.
       
     def turn
         loop do
-            puts "You are the codebreaker! Guess the 4 digit, numeric code."
-            code_guess = gets.chomp
-            if code_guess.match?(/\A\d{4}\z/)
-                code_guess = code_guess.chomp.chars.map(&:to_i)
-                add_to_gameboard(code_guess)
-                feedback(code_guess, @code_to_break)
-                show_board
+            puts "You are the codebreaker! Guess the 4 digit, numeric code."        # Here the game turn looped through.
+            code_guess = gets.chomp                                                 
+            if code_guess.match?(/\A\d{4}\z/)                                       # The codebreaker must make a 4 digit, numeric guess.
+                code_guess = code_guess.chomp.chars.map(&:to_i)                     
+                add_to_gameboard(code_guess)                                        # The code guess is added to the game board.
+                feedback(code_guess, @code_to_break)                                # Comparisons are made between the code_guess and the code_to_break.
+                show_board                                                          # The game board is shown so the codebreaker can see the feeback.  
                 if win_condition?
                     puts "Congratulations! You've cracked the code!"
                     return
-                end
+                end                                                                 # Here we check the win conditions to see if the game is over.
                 turn_count
-                if @turn == 12
+                if @turn == 12                                                      # If the game reaches 12 turns then the game is over.
                     puts "Game over! You've reached the maximum number of turns."
                     return
                     break
@@ -95,7 +93,7 @@ class Mastermind
         end
       end
 
-    def win_condition?
+    def win_condition?                      # The win condition method checks that 4 red pegs are in a row which indicates all numbers are correct and in the correct positions.
         @board.each_slice(8) do |row|
             consecutive_red_count = 0
             row.each do |peg|
